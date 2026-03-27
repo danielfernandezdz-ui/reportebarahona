@@ -131,7 +131,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <table class="personal-table">
       <thead><tr><th>Nombre</th><th>Cargo</th><th>Presente</th><th></th></tr></thead>
       <tbody id="personal-body">
-        <tr><td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px"><option>Gerente de Proyecto</option><option>Director de Proyecto</option><option>Jefe de RRHH</option><option>Asesor SIG</option><option>Supervisor forestal</option><option>Coordinador forestal</option><option>Especialista riego</option><option>Especialista SIG</option><option>Maestro de terreno</option><option>Asistente de terreno</option><option>APR</option><option>Censista forestal</option></select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+        <tr><td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px"><option>Gerente de Proyecto</option><option>Director de Proyecto</option><option>Administrador de Contrato</option><option>Jefe de RRHH</option><option>Asesor SIG</option><option>Supervisor forestal</option><option>Coordinador forestal</option><option>Especialista riego</option><option>Especialista SIG</option><option>Maestro de terreno</option><option>Asistente de terreno</option><option>APR</option><option>Censista forestal</option></select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
       </tbody>
     </table>
     <button class="btn-add-row" onclick="addPersonal()">+ Agregar persona</button>
@@ -264,7 +264,7 @@ document.getElementById('fecha').valueAsDate = new Date();
 // --- PERSONAL ---
 function addPersonal(){
   const b=document.getElementById('personal-body');
-  const cargos=['Gerente de Proyecto','Director de Proyecto','Jefe de RRHH','Asesor SIG','Supervisor forestal','Coordinador forestal','Especialista riego','Especialista SIG','Maestro de terreno','Asistente de terreno','APR','Censista forestal'];
+  const cargos=['Gerente de Proyecto','Director de Proyecto','Administrador de Contrato','Jefe de RRHH','Asesor SIG','Supervisor forestal','Coordinador forestal','Especialista riego','Especialista SIG','Maestro de terreno','Asistente de terreno','APR','Censista forestal'];
   const tr=document.createElement('tr');
   tr.innerHTML=`<td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px">${cargos.map(c=>`<option>${c}</option>`).join('')}</select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td>`;
   b.appendChild(tr);
