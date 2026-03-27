@@ -275,8 +275,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   </div>
 
   <!-- ACCIÓN FINAL -->
-  <div class="action-bar">
+  <div class="action-bar" style="gap:16px">
     <button id="btn-descarga" class="btn-pdf" onclick="generarDescarga()">⬇ Descargar Reporte</button>
+    <button id="btn-nuevo" onclick="limpiarFormulario()" style="display:none;background:#2d9e6b;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">🔄 Nuevo Reporte</button>
   </div>
 
 </div>
@@ -649,6 +650,7 @@ async function generarDescarga(){
       showToast(`✅ ZIP descargado: PDF + ${docsPDF.length} documento(s)`);
     }
     bloquearFormulario();
+    document.getElementById('btn-nuevo').style.display='block';
   } catch(err){
     console.error(err);
     showToast('❌ Error al generar el reporte',true);
