@@ -131,7 +131,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <table class="personal-table">
       <thead><tr><th>Nombre</th><th>Cargo</th><th>Presente</th><th></th></tr></thead>
       <tbody id="personal-body">
-        <tr><td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px"><option>Supervisor forestal</option><option>Coordinador forestal</option><option>Especialista riego</option><option>Especialista SIG</option><option>Maestro de terreno</option><option>Asistente de terreno</option><option>APR</option><option>Censista forestal</option></select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+        <tr><td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px"><option>Gerente de Proyecto</option><option>Director de Proyecto</option><option>Jefe de RRHH</option><option>Asesor SIG</option><option>Supervisor forestal</option><option>Coordinador forestal</option><option>Especialista riego</option><option>Especialista SIG</option><option>Maestro de terreno</option><option>Asistente de terreno</option><option>APR</option><option>Censista forestal</option></select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
       </tbody>
     </table>
     <button class="btn-add-row" onclick="addPersonal()">+ Agregar persona</button>
@@ -157,6 +157,11 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Test alcohol/drogas</label></div>
       <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Protocolo radiación UV</label></div>
       <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Registro asistencia R-022</label></div>
+      <div class="check-item" onclick="toggleCheck(this);toggleOtro(this,'otros-docs')" style="grid-column:1/-1"><input type="checkbox"/>  <label>Otros</label></div>
+    </div>
+    <div id="otros-docs" style="display:none;margin-top:8px">
+      <label>Especificar otro documento realizado</label>
+      <input type="text" id="otros-docs-txt" placeholder="Ej: Permiso de trabajo en altura, difusión ECF N°4..."/>
     </div>
 
     <div class="section-sub" style="margin-top:18px">EPP utilizado</div>
@@ -169,6 +174,11 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Ropa manga larga</label></div>
       <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Bloqueador solar FPS 50+</label></div>
       <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Legionario</label></div>
+      <div class="check-item" onclick="toggleCheck(this);toggleOtro(this,'otros-epp')" style="grid-column:1/-1"><input type="checkbox"/> <label>Otros</label></div>
+    </div>
+    <div id="otros-epp" style="display:none;margin-top:8px">
+      <label>Especificar otro EPP utilizado</label>
+      <input type="text" id="otros-epp-txt" placeholder="Ej: Arnés de seguridad, protector auditivo, mascarilla..."/>
     </div>
 
     <div class="section-sub" style="margin-top:18px">Estado general de seguridad del día</div>
@@ -199,9 +209,13 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   <!-- FOTOS -->
   <div class="card">
     <div class="card-title">Registro Fotográfico</div>
-    <div class="foto-zone" onclick="document.getElementById('foto-input').click()">
+    <div class="foto-zone" id="foto-zone"
+      onclick="document.getElementById('foto-input').click()"
+      ondragover="event.preventDefault();this.style.borderColor='#2d6a9f';this.style.background='#eef4fb'"
+      ondragleave="this.style.borderColor='#cbd5e0';this.style.background='#f7fafc'"
+      ondrop="handleDrop(event)">
       <span>📷</span>
-      <p>Haz clic para adjuntar fotos o arrastra aquí</p>
+      <p>Haz clic o arrastra fotos aquí</p>
       <p style="font-size:11px;color:#a0aec0;margin-top:4px">JPG, PNG — Máx. 10 fotos</p>
     </div>
     <input type="file" id="foto-input" accept="image/*" multiple style="display:none" onchange="addFotos(event)"/>
@@ -230,14 +244,13 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 
   <!-- ACCIÓN FINAL -->
   <div class="action-bar">
-    <div style="color:#a0c4e8;font-size:12px;font-weight:600;white-space:nowrap">Enviar reporte a:</div>
+    <div style="color:#a0c4e8;font-size:12px;font-weight:600;white-space:nowrap">Destinatario:</div>
     <select id="destinatario">
       <option value="">— Seleccionar destinatario —</option>
       <option value="dfernandez@sustenting.com">D. Fernández — dfernandez@sustenting.com</option>
       <option value="pmolina@sustenting.com">P. Molina — pmolina@sustenting.com</option>
     </select>
     <button class="btn-pdf" onclick="generarPDF()">⬇ Descargar PDF</button>
-    <button class="btn-mail" onclick="enviarCorreo()">✉ Enviar por correo</button>
   </div>
 
 </div>
@@ -251,7 +264,7 @@ document.getElementById('fecha').valueAsDate = new Date();
 // --- PERSONAL ---
 function addPersonal(){
   const b=document.getElementById('personal-body');
-  const cargos=['Supervisor forestal','Coordinador forestal','Especialista riego','Especialista SIG','Maestro de terreno','Asistente de terreno','APR','Censista forestal'];
+  const cargos=['Gerente de Proyecto','Director de Proyecto','Jefe de RRHH','Asesor SIG','Supervisor forestal','Coordinador forestal','Especialista riego','Especialista SIG','Maestro de terreno','Asistente de terreno','APR','Censista forestal'];
   const tr=document.createElement('tr');
   tr.innerHTML=`<td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px">${cargos.map(c=>`<option>${c}</option>`).join('')}</select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td>`;
   b.appendChild(tr);
@@ -260,12 +273,16 @@ function delRow(btn){btn.closest('tr').remove()}
 
 // --- ACTIVIDADES ---
 const catActs={
-  'Monitoreo forestal':['Inventario forestal muestral','Censo forestal','Evaluación estado sanitario','Evaluación estructuras e infraestructura','Muestreo de suelos','Muestreo tejidos vegetales','Fotografías georreferenciadas'],
-  'Mantención rodales':['Mantención tazas y micro terrazas','Poda de formación','Desmalezado manual','Desmalezado con desbrozadora','Reposición tutores','Reposición protectores lagomorfos','Replante de individuos forestales'],
-  'Sistema de riego':['Inspección punto abastecimiento','Inspección estanques 10.000L','Inspección distribución rodales','Limpieza de filtros','Reparación fugas','Programa de riego','Riego de mantención'],
-  'Mantención camino':['Revisión camino acceso (900m)','Mantención con excavadora','Señalización vial'],
-  'Cerco perimetral':['Inspección cerco perimetral','Retensionado malla','Reparación portones','Mantención señaléticas'],
-  'Informes y admin':['Elaboración informe mensual','Actualización base de datos SIG','Reunión coordinación MVC','Registro planilla riego','Elaboración ART/PTS'],
+  'Monitoreo forestal':['Inventario forestal muestral','Censo forestal','Evaluación estado sanitario','Evaluación estructuras e infraestructura','Muestreo de suelos','Muestreo tejidos vegetales','Fotografías georreferenciadas','Otras'],
+  'Mantención rodales':['Mantención tazas y micro terrazas','Poda de formación','Desmalezado manual','Desmalezado con desbrozadora','Reposición tutores','Reposición protectores lagomorfos','Replante de individuos forestales','Otras'],
+  'Sistema de riego':['Inspección punto abastecimiento','Inspección estanques 10.000L','Inspección distribución rodales','Limpieza de filtros','Reparación fugas','Programa de riego','Riego de mantención','Otras'],
+  'Mantención camino':['Revisión camino acceso (900m)','Mantención con excavadora','Señalización vial','Otras'],
+  'Cerco perimetral':['Inspección cerco perimetral','Retensionado malla','Reparación portones','Mantención señaléticas','Otras'],
+  'Informes y admin':['Elaboración informe mensual','Actualización base de datos SIG','Reunión coordinación MVC','Registro planilla riego','Elaboración ART/PTS','Otras'],
+  'Inspección DET':['Revisión normativa DET','Control acceso y tránsito','Verificación acreditaciones','Reunión con contraparte DET','Inspección estándares ECF','Reporte a DET','Otras'],
+  'Inspección MVC':['Reunión con contraparte MVC','Revisión cumplimiento contrato','Inspección instalaciones faena','Verificación documentación MVC','Entrega de informes MVC','Otras'],
+  'Inspecciones generales':['Inspección general terreno','Inspección vehículos y equipos','Inspección herramientas','Inspección EPP dotación','Inspección ambiental','Inspección infraestructura general','Otras'],
+  'Otras':['Capacitación interna','Traslado de personal o materiales','Gestión administrativa','Coordinación proveedores','Actividad no contemplada en categorías anteriores'],
 };
 function addActividad(){
   const d=document.getElementById('actividades-list');
@@ -311,6 +328,11 @@ function toggleCheck(el){
   cb.checked=!cb.checked;
   el.classList.toggle('checked',cb.checked);
 }
+function toggleOtro(el,id){
+  const cb=el.querySelector('input[type=checkbox]');
+  document.getElementById(id).style.display=cb.checked?'block':'none';
+  if(!cb.checked) document.getElementById(id+'-txt').value='';
+}
 let semaforoVal='';
 function setSemaforo(val,btn){
   semaforoVal=val;
@@ -330,18 +352,22 @@ function addMaterial(){
 
 // --- FOTOS ---
 let fotosData=[];
-function addFotos(e){
-  const files=[...e.target.files];
-  if(fotosData.length+files.length>10){showToast('Máximo 10 fotos permitidas');return}
+function handleDrop(e){
+  e.preventDefault();
+  const zone=document.getElementById('foto-zone');
+  zone.style.borderColor='#cbd5e0';zone.style.background='#f7fafc';
+  const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));
+  if(!files.length){showToast('⚠️ Solo se permiten imágenes');return}
+  processFotos(files);
+}
+function addFotos(e){processFotos([...e.target.files]);e.target.value='';}
+function processFotos(files){
+  if(fotosData.length+files.length>10){showToast('⚠️ Máximo 10 fotos permitidas');return}
   files.forEach(f=>{
     const r=new FileReader();
-    r.onload=ev=>{
-      fotosData.push({src:ev.target.result,caption:''});
-      renderFotos();
-    };
+    r.onload=ev=>{fotosData.push({src:ev.target.result,caption:''});renderFotos();};
     r.readAsDataURL(f);
   });
-  e.target.value='';
 }
 function renderFotos(){
   const c=document.getElementById('fotos-preview');
