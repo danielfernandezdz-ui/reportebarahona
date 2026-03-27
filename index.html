@@ -125,6 +125,55 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     </div>
   </div>
 
+  <!-- VISITAS DET / MVC -->
+  <div class="card">
+    <div class="card-title">Visitas DET / MVC</div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span style="font-size:13px;font-weight:500;color:#2d3748">¿Se realizaron visitas DET o MVC durante el día?</span>
+      <div style="display:flex;gap:10px">
+        <button class="sem-btn" id="visita-si" onclick="toggleVisita(true)" style="flex:none;padding:8px 24px">Sí</button>
+        <button class="sem-btn" id="visita-no" onclick="toggleVisita(false)" style="flex:none;padding:8px 24px">No</button>
+      </div>
+    </div>
+
+    <div id="visita-detalle" style="display:none;margin-top:18px">
+
+      <div class="section-sub">Personas que visitaron</div>
+      <table class="personal-table" style="margin-bottom:8px">
+        <thead><tr><th>Nombre</th><th>Cargo / Institución</th><th></th></tr></thead>
+        <tbody id="visitas-body">
+          <tr>
+            <td><input type="text" placeholder="Nombre del visitante"/></td>
+            <td><input type="text" placeholder="Ej: Ingeniero MVC / Inspector DET"/></td>
+            <td><button class="btn-del" onclick="delRow(this)">×</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-add-row" onclick="addVisitante()">+ Agregar visitante</button>
+
+      <div style="margin-top:16px">
+        <label>Detalle de la visita</label>
+        <textarea id="visita-obs" style="min-height:90px" placeholder="Describir el motivo de la visita, temas tratados, acuerdos, instrucciones recibidas, observaciones del visitante..."></textarea>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="section-sub">Documentos y fotos de la visita</div>
+        <div class="foto-zone" id="visita-zone"
+          onclick="document.getElementById('visita-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='#2d6a9f';this.style.background='#eef4fb'"
+          ondragleave="this.style.borderColor='#cbd5e0';this.style.background='#f7fafc'"
+          ondrop="handleDropVisita(event)">
+          <span>📎</span>
+          <p>Haz clic o arrastra fotos y documentos aquí</p>
+          <p style="font-size:11px;color:#a0aec0;margin-top:4px">JPG, PNG, PDF — Máx. 5 archivos</p>
+        </div>
+        <input type="file" id="visita-input" accept="image/*,.pdf" multiple style="display:none" onchange="addVisitaArchivos(event)"/>
+        <div id="visita-archivos-preview" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px"></div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- DOTACIÓN -->
   <div class="card">
     <div class="card-title">Dotación de Personal</div>
@@ -260,6 +309,64 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 <script>
 // --- INIT ---
 document.getElementById('fecha').valueAsDate = new Date();
+
+// --- VISITAS ---
+let visitaArchivos=[];
+let visitaVal=null;
+function toggleVisita(val){
+  visitaVal=val;
+  const si=document.getElementById('visita-si');
+  const no=document.getElementById('visita-no');
+  const det=document.getElementById('visita-detalle');
+  si.classList.toggle('verde',val===true);
+  si.classList.toggle('active',val===true);
+  no.classList.toggle('rojo',val===false);
+  no.classList.toggle('active',val===false);
+  det.style.display=val?'block':'none';
+}
+function addVisitante(){
+  const b=document.getElementById('visitas-body');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type="text" placeholder="Nombre del visitante"/></td><td><input type="text" placeholder="Ej: Ingeniero MVC / Inspector DET"/></td><td><button class="btn-del" onclick="delRow(this)">×</button></td>`;
+  b.appendChild(tr);
+}
+function handleDropVisita(e){
+  e.preventDefault();
+  const zone=document.getElementById('visita-zone');
+  zone.style.borderColor='#cbd5e0';zone.style.background='#f7fafc';
+  const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')||f.type==='application/pdf');
+  if(!files.length){showToast('⚠️ Solo imágenes o PDF');return}
+  procesarVisitaArchivos(files);
+}
+function addVisitaArchivos(e){procesarVisitaArchivos([...e.target.files]);e.target.value='';}
+function procesarVisitaArchivos(files){
+  if(visitaArchivos.length+files.length>5){showToast('⚠️ Máximo 5 archivos');return}
+  files.forEach(f=>{
+    if(f.type==='application/pdf'){
+      visitaArchivos.push({src:null,nombre:f.name,tipo:'pdf'});
+      renderVisitaArchivos();
+    } else {
+      const r=new FileReader();
+      r.onload=ev=>{visitaArchivos.push({src:ev.target.result,nombre:f.name,tipo:'img'});renderVisitaArchivos();};
+      r.readAsDataURL(f);
+    }
+  });
+}
+function renderVisitaArchivos(){
+  const c=document.getElementById('visita-archivos-preview');
+  c.innerHTML='';
+  visitaArchivos.forEach((f,i)=>{
+    const d=document.createElement('div');
+    d.style.cssText='position:relative;width:100px';
+    if(f.tipo==='img'){
+      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;overflow:hidden"><img src="${f.src}" style="width:100%;height:100%;object-fit:cover"/></div><button onclick="delVisitaArchivo(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><div style="font-size:10px;color:#718096;margin-top:4px;word-break:break-all">${f.nombre}</div>`;
+    } else {
+      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;background:#f7fafc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="font-size:28px">📄</span><span style="font-size:10px;color:#718096">PDF</span></div><button onclick="delVisitaArchivo(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><div style="font-size:10px;color:#718096;margin-top:4px;word-break:break-all">${f.nombre}</div>`;
+    }
+    c.appendChild(d);
+  });
+}
+function delVisitaArchivo(i){visitaArchivos.splice(i,1);renderVisitaArchivos();}
 
 // --- PERSONAL ---
 function addPersonal(){
