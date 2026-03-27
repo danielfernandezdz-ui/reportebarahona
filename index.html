@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Reporte Diario Supervisor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f0f4f8;color:#1a202c;min-height:100vh}
+header{background:#1a3a5c;color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px}
+header .logo{font-size:20px;font-weight:600;letter-spacing:0.5px}
+header .sub{font-size:12px;color:#a0c4e8;margin-top:2px}
+.badge{background:#2d6a9f;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px;margin-left:auto;white-space:nowrap}
+.container{max-width:860px;margin:24px auto;padding:0 16px 60px}
+.card{background:#fff;border-radius:12px;border:0.5px solid #d1d9e0;padding:24px;margin-bottom:20px}
+.card-title{font-size:13px;font-weight:600;color:#2d6a9f;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #e8edf2}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+label{display:block;font-size:12px;color:#4a5568;margin-bottom:4px;font-weight:500}
+input,select,textarea{width:100%;background:#f7fafc;border:0.5px solid #cbd5e0;border-radius:8px;padding:9px 12px;font-size:13px;color:#1a202c;font-family:inherit;outline:none;transition:border 0.15s}
+input:focus,select:focus,textarea:focus{border-color:#2d6a9f;background:#fff}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+.field{margin-bottom:0}
+.section-sub{font-size:12px;font-weight:600;color:#4a5568;margin:16px 0 10px;text-transform:uppercase;letter-spacing:0.3px}
+
+/* Personal table */
+.personal-table{width:100%;border-collapse:collapse;font-size:12px}
+.personal-table th{background:#eef4fb;color:#2d6a9f;padding:8px 10px;text-align:left;font-weight:600;border-bottom:1px solid #d1d9e0}
+.personal-table td{padding:7px 8px;border-bottom:0.5px solid #e8edf2}
+.personal-table tr:last-child td{border-bottom:none}
+.personal-table input{padding:5px 8px;font-size:12px}
+.btn-add-row{background:none;border:0.5px dashed #2d6a9f;color:#2d6a9f;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;margin-top:8px;font-family:inherit}
+.btn-add-row:hover{background:#eef4fb}
+.btn-del{background:none;border:none;color:#e53e3e;cursor:pointer;font-size:15px;padding:2px 6px}
+
+/* Actividades */
+.actividad-item{background:#f7fafc;border:0.5px solid #d1d9e0;border-radius:8px;padding:14px;margin-bottom:10px;position:relative}
+.actividad-item select,.actividad-item textarea,.actividad-item input{margin-bottom:8px}
+.actividad-item select:last-of-type{margin-bottom:0}
+.btn-del-act{position:absolute;top:10px;right:10px;background:none;border:none;color:#a0aec0;cursor:pointer;font-size:16px}
+.btn-del-act:hover{color:#e53e3e}
+
+/* Seguridad checks */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.check-item{display:flex;align-items:center;gap:8px;background:#f7fafc;border:0.5px solid #d1d9e0;border-radius:8px;padding:9px 12px;cursor:pointer}
+.check-item input[type=checkbox]{width:16px;height:16px;accent-color:#2d6a9f;cursor:pointer;flex-shrink:0}
+.check-item label{font-size:12px;color:#2d3748;margin:0;cursor:pointer;font-weight:400}
+.check-item.checked{background:#eef4fb;border-color:#2d6a9f}
+.semaforo{display:flex;gap:10px;margin-top:10px}
+.sem-btn{flex:1;padding:8px;border:0.5px solid #d1d9e0;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;background:#f7fafc;transition:all 0.15s}
+.sem-btn.verde.active{background:#c6f6d5;border-color:#38a169;color:#276749}
+.sem-btn.amarillo.active{background:#fefcbf;border-color:#d69e2e;color:#744210}
+.sem-btn.rojo.active{background:#fed7d7;border-color:#e53e3e;color:#822727}
+
+/* Materiales */
+.mat-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:6px}
+.mat-row input{margin:0}
+
+/* Fotos */
+.foto-zone{border:1.5px dashed #cbd5e0;border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:#f7fafc;transition:all 0.15s}
+.foto-zone:hover{border-color:#2d6a9f;background:#eef4fb}
+.foto-zone p{font-size:13px;color:#718096;margin-top:6px}
+.foto-zone span{font-size:24px}
+.fotos-preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.foto-thumb{position:relative;width:100px;height:100px}
+.foto-thumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:0.5px solid #d1d9e0}
+.foto-thumb .foto-del{position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:20px;text-align:center}
+.foto-caption{width:100px;margin-top:4px;font-size:11px;padding:4px 6px}
+
+/* Planificacion */
+.plan-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-bottom:8px}
+.plan-item input[type=date]{width:auto}
+
+/* Destinatarios y acciones */
+.action-bar{background:#1a3a5c;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.action-bar select{flex:1;min-width:200px;background:#2d5a80;border-color:#3d7ab0;color:#fff}
+.action-bar select option{background:#1a3a5c;color:#fff}
+.btn-pdf{background:#e07b39;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s}
+.btn-pdf:hover{background:#c9682a}
+.btn-mail{background:#2d9e6b;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s}
+.btn-mail:hover{background:#237a53}
+.toast{position:fixed;bottom:24px;right:24px;background:#2d9e6b;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr}.mat-row{grid-template-columns:1fr 1fr auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Sustenting Chile SpA</div>
+    <div class="sub">Forestación Barahona · MVC-SGS-CSER-001-2026</div>
+  </div>
+  <div class="badge">Reporte Diario Supervisor</div>
+</header>
+
+<div class="container">
+
+  <!-- ENCABEZADO -->
+  <div class="card">
+    <div class="card-title">Información General</div>
+    <div class="grid3">
+      <div class="field"><label>Fecha del reporte</label><input type="date" id="fecha"/></div>
+      <div class="field"><label>Supervisor responsable</label><input type="text" id="supervisor" placeholder="Nombre completo"/></div>
+      <div class="field"><label>Condición climática</label>
+        <select id="clima">
+          <option value="">Seleccionar...</option>
+          <option>Despejado</option><option>Parcialmente nublado</option>
+          <option>Nublado</option><option>Lluvia leve</option>
+          <option>Lluvia intensa</option><option>Viento fuerte</option>
+          <option>Nieve/helada</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="field"><label>Temperatura aprox. (°C)</label><input type="number" id="temp" placeholder="ej: 18"/></div>
+      <div class="field"><label>Índice UV del día</label>
+        <select id="uv">
+          <option value="">Seleccionar...</option>
+          <option>Bajo (0-2)</option><option>Moderado (3-5)</option>
+          <option>Alto (6-7)</option><option>Muy alto (8-10)</option><option>Extremo (11+)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOTACIÓN -->
+  <div class="card">
+    <div class="card-title">Dotación de Personal</div>
+    <table class="personal-table">
+      <thead><tr><th>Nombre</th><th>Cargo</th><th>Presente</th><th></th></tr></thead>
+      <tbody id="personal-body">
+        <tr><td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px"><option>Supervisor forestal</option><option>Coordinador forestal</option><option>Especialista riego</option><option>Especialista SIG</option><option>Maestro de terreno</option><option>Asistente de terreno</option><option>APR</option><option>Censista forestal</option></select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-add-row" onclick="addPersonal()">+ Agregar persona</button>
+  </div>
+
+  <!-- ACTIVIDADES -->
+  <div class="card">
+    <div class="card-title">Actividades del Día</div>
+    <div id="actividades-list"></div>
+    <button class="btn-add-row" onclick="addActividad()">+ Agregar actividad</button>
+  </div>
+
+  <!-- SEGURIDAD -->
+  <div class="card">
+    <div class="card-title">Variables de Seguridad</div>
+    <div class="section-sub">Documentos realizados</div>
+    <div class="check-grid" id="docs-seg">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>ART / PTS firmado</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>ODI difundida</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Charla diaria de seguridad</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Check list vehículos</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Check list herramientas</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Test alcohol/drogas</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Protocolo radiación UV</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/>  <label>Registro asistencia R-022</label></div>
+    </div>
+
+    <div class="section-sub" style="margin-top:18px">EPP utilizado</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Casco</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Lentes de seguridad</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Guantes</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Calzado de seguridad</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Chaleco reflectante</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Ropa manga larga</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Bloqueador solar FPS 50+</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"/> <label>Legionario</label></div>
+    </div>
+
+    <div class="section-sub" style="margin-top:18px">Estado general de seguridad del día</div>
+    <div class="semaforo">
+      <button class="sem-btn verde" onclick="setSemaforo('verde',this)">🟢 Sin novedades</button>
+      <button class="sem-btn amarillo" onclick="setSemaforo('amarillo',this)">🟡 Observaciones menores</button>
+      <button class="sem-btn rojo" onclick="setSemaforo('rojo',this)">🔴 Incidente / situación crítica</button>
+    </div>
+    <div style="margin-top:12px">
+      <label>Descripción de incidentes u observaciones de seguridad</label>
+      <textarea id="seg-obs" placeholder="Describir incidentes, cuasi accidentes, condiciones inseguras detectadas, acciones correctivas tomadas..."></textarea>
+    </div>
+  </div>
+
+  <!-- MATERIALES -->
+  <div class="card">
+    <div class="card-title">Materiales e Insumos Utilizados</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:6px">
+      <label style="font-size:11px">Material / Insumo</label>
+      <label style="font-size:11px">Cantidad</label>
+      <label style="font-size:11px">Unidad</label>
+      <span></span>
+    </div>
+    <div id="mat-list"></div>
+    <button class="btn-add-row" onclick="addMaterial()">+ Agregar material</button>
+  </div>
+
+  <!-- FOTOS -->
+  <div class="card">
+    <div class="card-title">Registro Fotográfico</div>
+    <div class="foto-zone" onclick="document.getElementById('foto-input').click()">
+      <span>📷</span>
+      <p>Haz clic para adjuntar fotos o arrastra aquí</p>
+      <p style="font-size:11px;color:#a0aec0;margin-top:4px">JPG, PNG — Máx. 10 fotos</p>
+    </div>
+    <input type="file" id="foto-input" accept="image/*" multiple style="display:none" onchange="addFotos(event)"/>
+    <div class="fotos-preview" id="fotos-preview"></div>
+  </div>
+
+  <!-- OBSERVACIONES -->
+  <div class="card">
+    <div class="card-title">Observaciones Generales</div>
+    <div class="field">
+      <label>Observaciones del día</label>
+      <textarea id="obs-generales" style="min-height:100px" placeholder="Novedades del terreno, estado de infraestructura, condiciones del sistema de riego, estado de rodales, problemas detectados..."></textarea>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>Comunicaciones con mandante (MVC)</label>
+      <textarea id="obs-mvc" placeholder="Coordinaciones, solicitudes, instrucciones recibidas de MVC o DET..."></textarea>
+    </div>
+  </div>
+
+  <!-- PLANIFICACIÓN -->
+  <div class="card">
+    <div class="card-title">Planificación Próximos Días</div>
+    <div id="plan-list"></div>
+    <button class="btn-add-row" onclick="addPlan()">+ Agregar actividad planificada</button>
+  </div>
+
+  <!-- ACCIÓN FINAL -->
+  <div class="action-bar">
+    <div style="color:#a0c4e8;font-size:12px;font-weight:600;white-space:nowrap">Enviar reporte a:</div>
+    <select id="destinatario">
+      <option value="">— Seleccionar destinatario —</option>
+      <option value="dfernandez@sustenting.com">D. Fernández — dfernandez@sustenting.com</option>
+      <option value="pmolina@sustenting.com">P. Molina — pmolina@sustenting.com</option>
+    </select>
+    <button class="btn-pdf" onclick="generarPDF()">⬇ Descargar PDF</button>
+    <button class="btn-mail" onclick="enviarCorreo()">✉ Enviar por correo</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// --- INIT ---
+document.getElementById('fecha').valueAsDate = new Date();
+
+// --- PERSONAL ---
+function addPersonal(){
+  const b=document.getElementById('personal-body');
+  const cargos=['Supervisor forestal','Coordinador forestal','Especialista riego','Especialista SIG','Maestro de terreno','Asistente de terreno','APR','Censista forestal'];
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type="text" placeholder="Nombre"/></td><td><select style="padding:5px 8px;font-size:12px">${cargos.map(c=>`<option>${c}</option>`).join('')}</select></td><td><select style="padding:5px 8px;font-size:12px"><option>✓ Presente</option><option>✗ Ausente</option><option>~ Medio día</option></select></td><td><button class="btn-del" onclick="delRow(this)">×</button></td>`;
+  b.appendChild(tr);
+}
+function delRow(btn){btn.closest('tr').remove()}
+
+// --- ACTIVIDADES ---
+const catActs={
+  'Monitoreo forestal':['Inventario forestal muestral','Censo forestal','Evaluación estado sanitario','Evaluación estructuras e infraestructura','Muestreo de suelos','Muestreo tejidos vegetales','Fotografías georreferenciadas'],
+  'Mantención rodales':['Mantención tazas y micro terrazas','Poda de formación','Desmalezado manual','Desmalezado con desbrozadora','Reposición tutores','Reposición protectores lagomorfos','Replante de individuos forestales'],
+  'Sistema de riego':['Inspección punto abastecimiento','Inspección estanques 10.000L','Inspección distribución rodales','Limpieza de filtros','Reparación fugas','Programa de riego','Riego de mantención'],
+  'Mantención camino':['Revisión camino acceso (900m)','Mantención con excavadora','Señalización vial'],
+  'Cerco perimetral':['Inspección cerco perimetral','Retensionado malla','Reparación portones','Mantención señaléticas'],
+  'Informes y admin':['Elaboración informe mensual','Actualización base de datos SIG','Reunión coordinación MVC','Registro planilla riego','Elaboración ART/PTS'],
+};
+function addActividad(){
+  const d=document.getElementById('actividades-list');
+  const cats=Object.keys(catActs);
+  const div=document.createElement('div');
+  div.className='actividad-item';
+  div.innerHTML=`
+    <button class="btn-del-act" onclick="this.parentElement.remove()">×</button>
+    <div class="grid2">
+      <div><label>Categoría</label>
+        <select onchange="updateSubcat(this)">
+          <option value="">Seleccionar categoría...</option>
+          ${cats.map(c=>`<option>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div><label>Actividad específica</label>
+        <select class="subcat"><option value="">— primero elige categoría —</option></select>
+      </div>
+    </div>
+    <div style="margin-top:8px"><label>Descripción / Hito logrado</label>
+      <textarea placeholder="Detalle de lo realizado, resultados, hallazgos..." style="min-height:65px"></textarea>
+    </div>
+    <div class="grid2" style="margin-top:8px">
+      <div><label>Sector / Rodal</label>
+        <select><option value="">Seleccionar...</option><option>Rodal 1</option><option>Rodal 2</option><option>Rodal 3</option><option>Camino acceso</option><option>Cerco perimetral</option><option>Instalación faena (IIFF)</option><option>General / Todo el predio</option></select>
+      </div>
+      <div><label>Estado de avance</label>
+        <select><option>Completado ✓</option><option>En progreso ⟳</option><option>Pendiente ○</option><option>Bloqueado ✗</option></select>
+      </div>
+    </div>`;
+  d.appendChild(div);
+}
+function updateSubcat(sel){
+  const cat=sel.value;
+  const sub=sel.closest('.actividad-item').querySelector('.subcat');
+  const opts=catActs[cat]||[];
+  sub.innerHTML=`<option value="">Seleccionar actividad...</option>${opts.map(o=>`<option>${o}</option>`).join('')}`;
+}
+
+// --- SEGURIDAD ---
+function toggleCheck(el){
+  const cb=el.querySelector('input[type=checkbox]');
+  cb.checked=!cb.checked;
+  el.classList.toggle('checked',cb.checked);
+}
+let semaforoVal='';
+function setSemaforo(val,btn){
+  semaforoVal=val;
+  document.querySelectorAll('.sem-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// --- MATERIALES ---
+const matUnidades=['unidad','kg','litros','metros','ml','sacos','rollos','pares'];
+function addMaterial(){
+  const d=document.getElementById('mat-list');
+  const div=document.createElement('div');
+  div.className='mat-row';
+  div.innerHTML=`<input type="text" placeholder="Ej: Protector individual plantas"/><input type="number" placeholder="0" min="0"/><select>${matUnidades.map(u=>`<option>${u}</option>`).join('')}</select><button class="btn-del" onclick="this.parentElement.remove()">×</button>`;
+  d.appendChild(div);
+}
+
+// --- FOTOS ---
+let fotosData=[];
+function addFotos(e){
+  const files=[...e.target.files];
+  if(fotosData.length+files.length>10){showToast('Máximo 10 fotos permitidas');return}
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      fotosData.push({src:ev.target.result,caption:''});
+      renderFotos();
+    };
+    r.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+function renderFotos(){
+  const c=document.getElementById('fotos-preview');
+  c.innerHTML='';
+  fotosData.forEach((f,i)=>{
+    const d=document.createElement('div');
+    d.className='foto-thumb';
+    d.innerHTML=`<img src="${f.src}"/><button class="foto-del" onclick="delFoto(${i})">×</button><input class="foto-caption" type="text" placeholder="Descripción..." value="${f.caption}" onchange="fotosData[${i}].caption=this.value"/>`;
+    c.appendChild(d);
+  });
+}
+function delFoto(i){fotosData.splice(i,1);renderFotos()}
+
+// --- PLANIFICACION ---
+function addPlan(){
+  const d=document.getElementById('plan-list');
+  const div=document.createElement('div');
+  div.className='plan-item';
+  const mañana=new Date();mañana.setDate(mañana.getDate()+1);
+  const fmt=mañana.toISOString().split('T')[0];
+  div.innerHTML=`<input type="date" value="${fmt}" style="width:140px"/><input type="text" placeholder="Actividad planificada..."/><button class="btn-del" onclick="this.parentElement.remove()">×</button>`;
+  d.appendChild(div);
+}
+
+// --- RECOPILAR DATOS ---
+function getData(){
+  const personal=[];
+  document.querySelectorAll('#personal-body tr').forEach(tr=>{
+    const cells=tr.querySelectorAll('td');
+    if(cells.length>=3) personal.push({nombre:cells[0].querySelector('input').value,cargo:cells[1].querySelector('select').value,estado:cells[2].querySelector('select').value});
+  });
+  const actividades=[];
+  document.querySelectorAll('.actividad-item').forEach(a=>{
+    const sels=a.querySelectorAll('select');
+    const txts=a.querySelectorAll('textarea');
+    actividades.push({cat:sels[0]?.value||'',act:sels[1]?.value||'',desc:txts[0]?.value||'',sector:sels[2]?.value||'',estado:sels[3]?.value||''});
+  });
+  const docs=[...document.querySelectorAll('#docs-seg .check-item.checked')].map(e=>e.querySelector('label').textContent.trim());
+  const epps=[...document.querySelectorAll('.check-item.checked')].filter(e=>!e.closest('#docs-seg')).map(e=>e.querySelector('label').textContent.trim());
+  const materiales=[];
+  document.querySelectorAll('.mat-row').forEach(r=>{
+    const ins=r.querySelectorAll('input');const sel=r.querySelector('select');
+    if(ins[0]?.value) materiales.push({nombre:ins[0].value,cantidad:ins[1]?.value||'',unidad:sel?.value||''});
+  });
+  const planificacion=[];
+  document.querySelectorAll('.plan-item').forEach(p=>{
+    const ins=p.querySelectorAll('input');
+    if(ins[1]?.value) planificacion.push({fecha:ins[0]?.value||'',act:ins[1].value});
+  });
+  return{
+    fecha:document.getElementById('fecha').value,
+    supervisor:document.getElementById('supervisor').value,
+    clima:document.getElementById('clima').value,
+    temp:document.getElementById('temp').value,
+    uv:document.getElementById('uv').value,
+    personal,actividades,docs,epps,semaforo:semaforoVal,
+    segObs:document.getElementById('seg-obs').value,
+    materiales,
+    obsGenerales:document.getElementById('obs-generales').value,
+    obsMvc:document.getElementById('obs-mvc').value,
+    planificacion,fotos:fotosData
+  };
+}
+
+// --- GENERAR PDF ---
+function generarPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const d=getData();
+  const W=210,M=15,CW=W-M*2;
+  let y=15;
+
+  // Header
+  doc.setFillColor(26,58,92);
+  doc.rect(0,0,W,28,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(13);doc.setFont('helvetica','bold');
+  doc.text('SUSTENTING CHILE SpA — Reporte Diario Supervisor',M,10);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');
+  doc.text('Forestación Barahona · Contrato MVC-SGS-CSER-001-2026',M,16);
+  doc.text(`Fecha: ${d.fecha} | Supervisor: ${d.supervisor||'—'} | Clima: ${d.clima} ${d.temp?d.temp+'°C':''} | UV: ${d.uv}`,M,22);
+  y=36;
+
+  const secTitle=(t)=>{
+    doc.setFillColor(238,244,251);doc.rect(M,y-4,CW,8,'F');
+    doc.setTextColor(45,106,159);doc.setFontSize(9);doc.setFont('helvetica','bold');
+    doc.text(t.toUpperCase(),M+2,y+1);
+    doc.setTextColor(26,32,44);doc.setFont('helvetica','normal');y+=10;
+  };
+  const row=(label,val)=>{
+    if(y>270){doc.addPage();y=15}
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text(label+':',M,y);
+    doc.setFont('helvetica','normal');
+    const lines=doc.splitTextToSize(val||'—',CW-30);
+    doc.text(lines,M+32,y);y+=lines.length*5+2;
+  };
+  const para=(text)=>{
+    if(!text)return;
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(26,32,44);
+    const lines=doc.splitTextToSize(text,CW);
+    lines.forEach(l=>{if(y>270){doc.addPage();y=15}doc.text(l,M,y);y+=5});
+    y+=2;
+  };
+
+  // Personal
+  secTitle('Dotación de Personal');
+  d.personal.forEach(p=>{
+    if(y>270){doc.addPage();y=15}
+    doc.setFontSize(8);
+    doc.text(`• ${p.nombre} — ${p.cargo} [${p.estado}]`,M+2,y);y+=5;
+  });
+  y+=4;
+
+  // Actividades
+  secTitle('Actividades del Día');
+  d.actividades.forEach((a,i)=>{
+    if(y>270){doc.addPage();y=15}
+    doc.setFont('helvetica','bold');doc.setFontSize(8);
+    doc.text(`${i+1}. [${a.cat}] ${a.act} — ${a.sector} (${a.estado})`,M+2,y);y+=5;
+    if(a.desc){doc.setFont('helvetica','normal');para('   '+a.desc)}
+    y+=1;
+  });
+
+  // Seguridad
+  secTitle('Variables de Seguridad');
+  const semTxt=semaforoVal==='verde'?'SIN NOVEDADES':semaforoVal==='amarillo'?'OBSERVACIONES MENORES':semaforoVal==='rojo'?'INCIDENTE / SITUACIÓN CRÍTICA':'—';
+  row('Estado general',semTxt);
+  row('Docs. realizados',d.docs.join(', ')||'Ninguno registrado');
+  row('EPP utilizado',d.epps.join(', ')||'Ninguno registrado');
+  if(d.segObs){row('Observaciones',d.segObs)}
+  y+=2;
+
+  // Materiales
+  if(d.materiales.length){
+    secTitle('Materiales e Insumos');
+    d.materiales.forEach(m=>{
+      if(y>270){doc.addPage();y=15}
+      doc.setFontSize(8);doc.text(`• ${m.nombre}: ${m.cantidad} ${m.unidad}`,M+2,y);y+=5;
+    });y+=2;
+  }
+
+  // Observaciones
+  secTitle('Observaciones Generales');
+  para(d.obsGenerales||'Sin observaciones registradas.');
+  if(d.obsMvc){row('Com. MVC',d.obsMvc)}
+  y+=2;
+
+  // Planificacion
+  if(d.planificacion.length){
+    secTitle('Planificación Próximos Días');
+    d.planificacion.forEach(p=>{
+      if(y>270){doc.addPage();y=15}
+      doc.setFontSize(8);doc.text(`• ${p.fecha}: ${p.act}`,M+2,y);y+=5;
+    });
+  }
+
+  // Fotos
+  if(d.fotos.length){
+    doc.addPage();y=15;
+    secTitle('Registro Fotográfico');
+    let col=0;
+    d.fotos.forEach((f,i)=>{
+      const x=M+(col*(CW/2+5));
+      try{doc.addImage(f.src,'JPEG',x,y,85,60)}catch(e){}
+      doc.setFontSize(7);doc.text(f.caption||`Foto ${i+1}`,x,y+63);
+      col++;if(col>=2){col=0;y+=70;if(y>250){doc.addPage();y=15;}}
+    });
+  }
+
+  // Footer
+  const pages=doc.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(7);doc.setTextColor(150);
+    doc.text(`Reporte generado: ${new Date().toLocaleString('es-CL')} — Pág. ${i}/${pages}`,M,290);
+  }
+
+  doc.save(`Reporte_Supervisor_Barahona_${d.fecha||'sin_fecha'}.pdf`);
+  showToast('✅ PDF generado correctamente');
+}
+
+// --- ENVIAR CORREO ---
+function enviarCorreo(){
+  const dest=document.getElementById('destinatario').value;
+  if(!dest){showToast('⚠️ Selecciona un destinatario primero');return}
+  const d=getData();
+  const fecha=d.fecha||'Sin fecha';
+  const supervisor=d.supervisor||'Supervisor';
+  const actsList=d.actividades.map((a,i)=>`${i+1}. [${a.cat}] ${a.act} — ${a.sector}`).join('\n')||'Sin actividades registradas';
+  const semTxt=semaforoVal==='verde'?'SIN NOVEDADES ✅':semaforoVal==='amarillo'?'OBSERVACIONES MENORES 🟡':semaforoVal==='rojo'?'INCIDENTE / SITUACIÓN CRÍTICA 🔴':'No especificado';
+  const subject=encodeURIComponent(`Reporte Diario Supervisor — Forestación Barahona — ${fecha}`);
+  const body=encodeURIComponent(
+`Estimado/a,
+
+Se adjunta el Reporte Diario del Supervisor correspondiente al ${fecha}.
+
+INFORMACIÓN GENERAL
+───────────────────
+Supervisor: ${supervisor}
+Fecha: ${fecha}
+Condición climática: ${d.clima} ${d.temp?'/ '+d.temp+'°C':''} | UV: ${d.uv}
+
+DOTACIÓN (${d.personal.length} personas)
+───────────────────
+${d.personal.map(p=>`• ${p.nombre} — ${p.cargo} [${p.estado}]`).join('\n')||'No registrada'}
+
+ACTIVIDADES DEL DÍA
+───────────────────
+${actsList}
+
+SEGURIDAD
+───────────────────
+Estado general: ${semTxt}
+Documentos: ${d.docs.join(', ')||'Ninguno'}
+${d.segObs?'Observaciones seguridad: '+d.segObs:''}
+
+OBSERVACIONES GENERALES
+───────────────────
+${d.obsGenerales||'Sin observaciones.'}
+${d.obsMvc?'Comunicaciones MVC: '+d.obsMvc:''}
+
+PLANIFICACIÓN PRÓXIMOS DÍAS
+───────────────────
+${d.planificacion.map(p=>`• ${p.fecha}: ${p.act}`).join('\n')||'Sin planificación registrada'}
+
+─────────────────────────────────────────
+Nota: Descargue y adjunte el PDF generado desde la herramienta de reporte.
+Proyecto: Mantención y Seguimiento Forestación Barahona RCA 083/2006
+Contrato: MVC-SGS-CSER-001-2026
+Sustenting Chile SpA — Ingeniería y Sustentabilidad
+`);
+  window.open(`mailto:${dest}?subject=${subject}&body=${body}`);
+  showToast('✉ Abriendo cliente de correo...');
+}
+
+// --- TOAST ---
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Init defaults
+addActividad();
+addMaterial();
+addPlan();
+</script>
+</body>
+</html>
