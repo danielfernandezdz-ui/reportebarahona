@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Reporte Diario Supervisor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f0f4f8;color:#1a202c;min-height:100vh}
@@ -299,7 +300,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       <option value="dfernandez@sustenting.com">D. Fernández — dfernandez@sustenting.com</option>
       <option value="pmolina@sustenting.com">P. Molina — pmolina@sustenting.com</option>
     </select>
-    <button class="btn-pdf" onclick="generarPDF()">⬇ Descargar PDF</button>
+    <button class="btn-pdf" onclick="generarDescarga()">⬇ Descargar Reporte</button>
   </div>
 
 </div>
@@ -689,8 +690,7 @@ function generarPDF(){
     doc.text(`Reporte generado: ${new Date().toLocaleString('es-CL')} — Pág. ${i}/${pages}`,M,290);
   }
 
-  doc.save(`Reporte_Supervisor_Barahona_${d.fecha||'sin_fecha'}.pdf`);
-  showToast('✅ PDF generado correctamente');
+  return doc.output('blob');
 }
 
 // --- ENVIAR CORREO ---
