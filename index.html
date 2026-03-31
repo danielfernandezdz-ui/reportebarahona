@@ -336,15 +336,17 @@ function addVarchivos(e){ procVarchivos([...e.target.files]); e.target.value='';
 function procVarchivos(files){
   if(!files.length){toast('Solo imágenes o PDF',true);return;}
   if(varchivos.length+files.length>5){toast('Máx. 5 archivos',true);return;}
-  files.forEach(f=>{ const r=new FileReader(); r.onload=ev=>{ varchivos.push({src:ev.target.result,nombre:f.name,tipo:f.type==='application/pdf'?'pdf':'img'}); renderVarchivos(); }; r.readAsDataURL(f); });
+  files.forEach(f=>{ const r=new FileReader(); r.onload=ev=>{ varchivos.push({src:ev.target.result,nombre:f.name,tipo:f.type==='application/pdf'?'pdf':'img',caption:''}); renderVarchivos(); }; r.readAsDataURL(f); });
 }
 function renderVarchivos(){
   const c=document.getElementById('vprev'); c.innerHTML='';
   varchivos.forEach((f,i)=>{
     const d=document.createElement('div'); d.style.cssText='position:relative;width:100px';
-    d.innerHTML=f.tipo==='img'
-      ?`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;overflow:hidden"><img src="${f.src}" style="width:100%;height:100%;object-fit:cover"/></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><div style="font-size:10px;color:#718096;margin-top:4px;word-break:break-all">${f.nombre}</div>`
-      :`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;background:#f7fafc;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:28px">📄</span><span style="font-size:10px;color:#718096">PDF</span></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><div style="font-size:10px;color:#718096;margin-top:4px;word-break:break-all">${f.nombre}</div>`;
+    if(f.tipo==='img'){
+      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;overflow:hidden"><img src="${f.src}" style="width:100%;height:100%;object-fit:cover"/></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><input type="text" placeholder="Descripción..." value="${f.caption||''}" oninput="varchivos[${i}].caption=this.value" style="width:100px;margin-top:4px;font-size:11px;padding:4px 6px;border:0.5px solid #cbd5e0;border-radius:6px;background:#f7fafc;font-family:inherit"/>`;
+    } else {
+      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;background:#f7fafc;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:28px">📄</span><span style="font-size:10px;color:#718096">PDF</span></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><input type="text" placeholder="Descripción..." value="${f.caption||''}" oninput="varchivos[${i}].caption=this.value" style="width:100px;margin-top:4px;font-size:11px;padding:4px 6px;border:0.5px solid #cbd5e0;border-radius:6px;background:#f7fafc;font-family:inherit"/>`;
+    }
     c.appendChild(d);
   });
 }
