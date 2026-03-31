@@ -343,9 +343,9 @@ function renderVarchivos(){
   varchivos.forEach((f,i)=>{
     const d=document.createElement('div'); d.style.cssText='position:relative;width:100px';
     if(f.tipo==='img'){
-      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;overflow:hidden"><img src="${f.src}" style="width:100%;height:100%;object-fit:cover"/></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><input type="text" placeholder="Descripción..." value="${f.caption||''}" oninput="varchivos[${i}].caption=this.value" style="width:100px;margin-top:4px;font-size:11px;padding:4px 6px;border:0.5px solid #cbd5e0;border-radius:6px;background:#f7fafc;font-family:inherit"/>`;
+      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;overflow:hidden"><img src="${f.src}" style="width:100%;height:100%;object-fit:cover"/></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><input data-va="${i}" type="text" placeholder="Descripción..." style="width:100px;margin-top:4px;font-size:11px;padding:4px 6px;border:0.5px solid #cbd5e0;border-radius:6px;background:#f7fafc;font-family:inherit"/>`;
     } else {
-      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;background:#f7fafc;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:28px">📄</span><span style="font-size:10px;color:#718096">PDF</span></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><input type="text" placeholder="Descripción..." value="${f.caption||''}" oninput="varchivos[${i}].caption=this.value" style="width:100px;margin-top:4px;font-size:11px;padding:4px 6px;border:0.5px solid #cbd5e0;border-radius:6px;background:#f7fafc;font-family:inherit"/>`;
+      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:0.5px solid #d1d9e0;background:#f7fafc;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:28px">📄</span><span style="font-size:10px;color:#718096">PDF</span></div><button onclick="delVa(${i})" style="position:absolute;top:-5px;right:-5px;background:#e53e3e;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer">×</button><input data-va="${i}" type="text" placeholder="Descripción..." style="width:100px;margin-top:4px;font-size:11px;padding:4px 6px;border:0.5px solid #cbd5e0;border-radius:6px;background:#f7fafc;font-family:inherit"/>`;
     }
     c.appendChild(d);
   });
@@ -387,9 +387,17 @@ function getData(){
   document.querySelectorAll('.act-item').forEach(a=>{ const s=a.querySelectorAll('select'); const t=a.querySelectorAll('textarea'); actividades.push({cat:s[0]?.value||'',act:s[1]?.value||'',desc:t[0]?.value||'',sector:s[2]?.value||'',estado:s[3]?.value||''}); });
   const docs=[...document.querySelectorAll('#docs-seg .chk.checked')].map(e=>e.querySelector('label').textContent.trim()).filter(x=>x!=='Otros');
   const epps=[...document.querySelectorAll('#epp-seg .chk.checked')].map(e=>e.querySelector('label').textContent.trim()).filter(x=>x!=='Otros');
-  const mats=[];
-  document.querySelectorAll('.mat-row').forEach(r=>{ const i=r.querySelectorAll('input'); const s=r.querySelector('select'); if(i[0]?.value) mats.push({nombre:i[0].value,cantidad:i[1]?.value||'',unidad:s?.value||''}); });
   const plan=[];
+  document.querySelectorAll('.mat-row').forEach(r=>{ const i=r.querySelectorAll('input'); const s=r.querySelector('select'); if(i[0]?.value) mats.push({nombre:i[0].value,cantidad:i[1]?.value||'',unidad:s?.value||''}); });
+  // Leer captions de varchivos directamente del DOM
+  document.querySelectorAll('#vprev input[data-va]').forEach(inp=>{
+    const i=parseInt(inp.getAttribute('data-va'));
+    if(varchivos[i]) varchivos[i].caption=inp.value;
+  });
+  // Leer captions de fotos directamente del DOM
+  document.querySelectorAll('#fprev input').forEach((inp,i)=>{
+    if(fotosData[i]) fotosData[i].caption=inp.value;
+  });
   document.querySelectorAll('.plan-row').forEach(p=>{ const i=p.querySelectorAll('input'); if(i[1]?.value) plan.push({fecha:i[0]?.value||'',act:i[1].value}); });
   const visitantes=[];
   document.querySelectorAll('#vbody tr').forEach(tr=>{ const i=tr.querySelectorAll('input'); if(i[0]?.value) visitantes.push({nombre:i[0].value,cargo:i[1]?.value||''}); });
