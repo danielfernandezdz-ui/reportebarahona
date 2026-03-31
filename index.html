@@ -424,9 +424,10 @@ function buildPDF(d){
   }
   y=40;
 
-  const sec=t=>{if(y>270){doc.addPage();y=15;} doc.setFillColor(238,244,251);doc.rect(M,y-4,CW,8,'F');doc.setTextColor(45,106,159);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(t.toUpperCase(),M+2,y+1);doc.setTextColor(26,32,44);doc.setFont('helvetica','normal');y+=10;};
-  const row=(l,v)=>{if(y>270){doc.addPage();y=15;}doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text(l+':',M,y);doc.setFont('helvetica','normal');const ln=doc.splitTextToSize(v||'—',CW-32);doc.text(ln,M+32,y);y+=ln.length*5+2;};
-  const para=t=>{if(!t)return;doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(26,32,44);const ln=doc.splitTextToSize(t,CW);ln.forEach(l=>{if(y>270){doc.addPage();y=15;}doc.text(l,M,y);y+=5;});y+=2;};
+  const limpiar=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[✓✗⟳○]/g,'').replace(/[^\x00-\x7F]/g,'?');
+  const sec=t=>{if(y>270){doc.addPage();y=15;} doc.setFillColor(238,244,251);doc.rect(M,y-4,CW,8,'F');doc.setTextColor(45,106,159);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(limpiar(t).toUpperCase(),M+2,y+1);doc.setTextColor(26,32,44);doc.setFont('helvetica','normal');y+=10;};
+  const row=(l,v)=>{if(y>270){doc.addPage();y=15;}doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text(limpiar(l)+':',M,y);doc.setFont('helvetica','normal');const ln=doc.splitTextToSize(limpiar(v),CW-32);doc.text(ln,M+32,y);y+=ln.length*5+2;};
+  const para=t=>{if(!t)return;doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(26,32,44);const ln=doc.splitTextToSize(limpiar(t),CW);ln.forEach(l=>{if(y>270){doc.addPage();y=15;}doc.text(l,M,y);y+=5;});y+=2;};
 
   sec('Visitas DET / MVC');
   if(d.visitaVal===null) para('No registrado.');
@@ -438,11 +439,11 @@ function buildPDF(d){
   }
   y+=4;
 
-  sec('Dotación de Personal');
-  d.personal.forEach(p=>{if(y>270){doc.addPage();y=15;}doc.setFontSize(8);doc.text(`• ${p.nombre||'—'} — ${p.cargo} [${p.estado}]`,M+2,y);y+=5;});y+=4;
+  sec('Dotacion de Personal');
+  d.personal.forEach(p=>{if(y>270){doc.addPage();y=15;}doc.setFontSize(8);doc.text(`• ${limpiar(p.nombre||'—')} — ${limpiar(p.cargo)} [${limpiar(p.estado).replace('Presente','Presente').replace('Ausente','Ausente').replace('Medio dia','Medio dia')}]`,M+2,y);y+=5;});y+=4;
 
-  sec('Actividades del Día');
-  d.actividades.forEach((a,i)=>{if(y>270){doc.addPage();y=15;}doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text(`${i+1}. [${a.cat}] ${a.act} — ${a.sector} (${a.estado})`,M+2,y);y+=5;if(a.desc){doc.setFont('helvetica','normal');para('   '+a.desc);}y+=1;});
+  sec('Actividades del Dia');
+  d.actividades.forEach((a,i)=>{if(y>270){doc.addPage();y=15;}doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text(`${i+1}. [${limpiar(a.cat)}] ${limpiar(a.act)} — ${limpiar(a.sector)} (${limpiar(a.estado)})`,M+2,y);y+=5;if(a.desc){doc.setFont('helvetica','normal');para(a.desc);}y+=1;});
 
   sec('Variables de Seguridad');
   const semTxt=d.semaforo==='verde'?'SIN NOVEDADES':d.semaforo==='amarillo'?'OBSERVACIONES MENORES':d.semaforo==='rojo'?'INCIDENTE / SITUACIÓN CRÍTICA':'—';
