@@ -16,7 +16,8 @@ header{background:#1a3a5c;color:#fff;padding:16px 24px;display:flex;align-items:
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 label{display:block;font-size:12px;color:#4a5568;margin-bottom:4px;font-weight:500}
-input,select,textarea{width:100%;background:#f7fafc;border:0.5px solid #cbd5e0;border-radius:8px;padding:9px 12px;font-size:13px;color:#1a202c;font-family:inherit;outline:none;transition:border .15s}
+input,select,textarea{width:100%;background:#f7fafc;border:0.5px solid #cbd5e0;border-radius:8px;padding:9px 12px;font-size:13px;color:#1a202c;font-family:inherit;outline:none;transition:border .15s;spellcheck:true}
+input[type=text],textarea{-webkit-spell-checking:true;spell-checking:normal}
 input:focus,select:focus,textarea:focus{border-color:#2d6a9f;background:#fff}
 textarea{resize:vertical;min-height:80px;line-height:1.5}
 .ssub{font-size:12px;font-weight:600;color:#4a5568;margin:16px 0 10px;text-transform:uppercase;letter-spacing:.3px}
@@ -95,7 +96,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <div class="card-title">Informacion General</div>
     <div class="g3">
       <div><label>Fecha</label><input type="date" id="fecha"/></div>
-      <div><label>Supervisor</label><input type="text" id="sup" placeholder="Nombre completo"/></div>
+      <div><label>Supervisor</label><input type="text" id="sup" placeholder="Nombre completo" spellcheck="false"/></div>
       <div><label>Condicion climatica</label>
         <select id="clima"><option value="">Seleccionar...</option><option>Despejado</option><option>Parcialmente nublado</option><option>Nublado</option><option>Lluvia leve</option><option>Lluvia intensa</option><option>Viento fuerte</option><option>Nieve/helada</option></select>
       </div>
@@ -126,7 +127,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
         </tbody>
       </table>
       <button class="badd" onclick="addVis()">+ Agregar visitante</button>
-      <div style="margin-top:16px"><label>Detalle de la visita</label><textarea id="vobs" style="min-height:90px" placeholder="Motivo, temas, acuerdos, instrucciones..."></textarea></div>
+      <div style="margin-top:16px"><label>Detalle de la visita</label><textarea id="vobs" style="min-height:90px" placeholder="Motivo, temas, acuerdos, instrucciones..." spellcheck="true" lang="es"></textarea></div>
       <div style="margin-top:14px">
         <div class="ssub">Fotos y documentos de la visita</div>
         <div class="fz" id="vfz" onclick="document.getElementById('vfi').click()"
@@ -191,7 +192,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       <button class="sb a" onclick="setSm('a',this)">Observaciones menores</button>
       <button class="sb r" onclick="setSm('r',this)">Incidente / situacion critica</button>
     </div>
-    <div style="margin-top:12px"><label>Descripcion de incidentes</label><textarea id="sobs" placeholder="Incidentes, cuasi accidentes, condiciones inseguras..."></textarea></div>
+    <div style="margin-top:12px"><label>Descripcion de incidentes</label><textarea id="sobs" placeholder="Incidentes, cuasi accidentes, condiciones inseguras..." spellcheck="true" lang="es"></textarea></div>
   </div>
 
   <div class="card">
@@ -218,8 +219,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 
   <div class="card">
     <div class="card-title">Observaciones Generales</div>
-    <div><label>Observaciones del dia</label><textarea id="obsg" style="min-height:100px" placeholder="Novedades del terreno, infraestructura, riego, rodales..."></textarea></div>
-    <div style="margin-top:14px"><label>Comunicaciones con mandante (MVC)</label><textarea id="obsmvc" placeholder="Coordinaciones, solicitudes, instrucciones..."></textarea></div>
+    <div><label>Observaciones del dia</label><textarea id="obsg" style="min-height:100px" placeholder="Novedades del terreno, infraestructura, riego, rodales..." spellcheck="true" lang="es"></textarea></div>
+    <div style="margin-top:14px"><label>Comunicaciones con mandante (MVC)</label><textarea id="obsmvc" placeholder="Coordinaciones, solicitudes, instrucciones..." spellcheck="true" lang="es"></textarea></div>
   </div>
 
   <div class="card">
@@ -272,7 +273,7 @@ function addA(){
       <div><label>Categoria</label><select onchange="updSub(this)"><option value="">Seleccionar...</option>${Object.keys(CAT).map(c=>`<option>${c}</option>`).join('')}</select></div>
       <div><label>Actividad especifica</label><select class="sub"><option value="">-- elige categoria --</option></select></div>
     </div>
-    <div style="margin-top:8px"><label>Descripcion / Hito logrado</label><textarea placeholder="Detalle..." style="min-height:65px"></textarea></div>
+    <div style="margin-top:8px"><label>Descripcion / Hito logrado</label><textarea placeholder="Detalle..." style="min-height:65px" spellcheck="true" lang="es"></textarea></div>
     <div class="g2" style="margin-top:8px">
       <div><label>Sector / Rodal</label><select><option value="">Seleccionar...</option><option>Rodal 1</option><option>Rodal 2</option><option>Rodal 3</option><option>Camino acceso</option><option>Cerco perimetral</option><option>Instalacion faena (IIFF)</option><option>General / Todo el predio</option></select></div>
       <div><label>Estado</label><select><option>Completado</option><option>En progreso</option><option>Pendiente</option><option>Bloqueado</option></select></div>
@@ -331,9 +332,9 @@ function rendV(){
   varchD.forEach((f,i)=>{
     const d=document.createElement('div'); d.className='ft';
     if(f.tipo==='img'){
-      d.innerHTML=`<img src="${f.src}"/><button class="fd" onclick="delVF(${i})">x</button><input class="fc" type="text" placeholder="Descripcion..." id="vcap${i}"/>`;
+      d.innerHTML=`<img src="${f.src}"/><button class="fd" onclick="delVF(${i})">x</button><input class="fc" type="text" placeholder="Descripcion..." id="vcap${i}" spellcheck="true" lang="es"/>`;
     } else {
-      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:.5px solid #d1d9e0;background:#f7fafc;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:28px">📄</span><span style="font-size:10px;color:#718096">PDF</span></div><button class="fd" onclick="delVF(${i})">x</button><input class="fc" type="text" placeholder="Descripcion..." id="vcap${i}"/>`;
+      d.innerHTML=`<div style="width:100px;height:100px;border-radius:8px;border:.5px solid #d1d9e0;background:#f7fafc;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:28px">📄</span><span style="font-size:10px;color:#718096">PDF</span></div><button class="fd" onclick="delVF(${i})">x</button><input class="fc" type="text" placeholder="Descripcion..." id="vcap${i}" spellcheck="true" lang="es"/>`;
     }
     c.appendChild(d);
   });
@@ -350,7 +351,7 @@ function procF(files){
 }
 function rendF(){
   const c=document.getElementById('ffp'); c.innerHTML='';
-  fotosD.forEach((f,i)=>{ const d=document.createElement('div'); d.className='ft'; d.innerHTML=`<img src="${f.src}"/><button class="fd" onclick="delF(${i})">x</button><input class="fc" type="text" placeholder="Descripcion..." id="fcap${i}"/>`; c.appendChild(d); });
+  fotosD.forEach((f,i)=>{ const d=document.createElement('div'); d.className='ft'; d.innerHTML=`<img src="${f.src}"/><button class="fd" onclick="delF(${i})">x</button><input class="fc" type="text" placeholder="Descripcion..." id="fcap${i}" spellcheck="true" lang="es"/>`; c.appendChild(d); });
 }
 function delF(i){ fotosD.splice(i,1); rendF(); }
 
