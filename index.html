@@ -388,7 +388,7 @@ function getData(){
     mats, vVal, vis, vobs:document.getElementById('vobs').value,
     obsg:document.getElementById('obsg').value,
     obsmvc:document.getElementById('obsmvc').value,
-    plan, fotos:fotosD, varc:varchD, cod:codR
+    plan, fotos:fotosD, varc:varchD, cod:null
   };
 }
 
@@ -615,6 +615,7 @@ async function descargar(){
     document.getElementById('cbg').style.display='inline-block';
     document.getElementById('cph').style.display='none';
     const d=getData();
+    d.cod=codR;  // asignar DESPUÉS de generar el código
     const blob=mkPDF(d);
     const nombre=`${codR}_Reporte_Barahona_${d.fch||'sin_fecha'}`;
     const pdfs=varchD.filter(f=>f.tipo==='pdf');
