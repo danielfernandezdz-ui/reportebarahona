@@ -518,8 +518,23 @@ function genCod(){
   const dd=String(h.getDate()).padStart(2,'0');
   const base=`SUST-${aa}-${mm}-${dd}`;
   const key=`rc_${base}`;
-  let n=parseInt(sessionStorage.getItem(key)||'0')+1;
-  sessionStorage.setItem(key,n);
+  let n=1;
+  try{
+    // localStorage persiste aunque se cierre la pestaña
+    const stored=localStorage.getItem(key);
+    n=stored?parseInt(stored)+1:1;
+    localStorage.setItem(key,n);
+    // Limpiar contadores de dias anteriores para no acumular basura
+    Object.keys(localStorage).forEach(k=>{
+      if(k.startsWith('rc_SUST-')&&k!==key) localStorage.removeItem(k);
+    });
+  } catch(e){
+    // Fallback en memoria si localStorage no está disponible (ej: Artifact)
+    if(!window._contadores) window._contadores={};
+    if(!window._contadores[base]) window._contadores[base]=0;
+    window._contadores[base]++;
+    n=window._contadores[base];
+  }
   return `${base}-${n}`;
 }
 
