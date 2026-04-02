@@ -529,12 +529,20 @@ function confirm2(){
 // BLOQUEAR
 function bloquear(){
   bloq=true;
-  document.querySelectorAll('.container input,.container select,.container textarea').forEach(el=>{el.disabled=true;el.style.opacity='.7';el.style.cursor='not-allowed';});
-  document.querySelectorAll('.badd,.bdel,.bda,.fz,.ck,.smf .sb').forEach(el=>{el.style.pointerEvents='none';el.style.opacity='.6';});
+  document.querySelectorAll('.container input,.container select,.container textarea').forEach(el=>{
+    el.disabled=true; el.style.opacity='.7'; el.style.cursor='not-allowed';
+  });
+  document.querySelectorAll('.badd,.bdel,.bda,.fz,.ck,.smf .sb').forEach(el=>{
+    el.style.pointerEvents='none'; el.style.opacity='.6';
+  });
   const b=document.getElementById('bdl');
-  b.textContent='Reporte Bloqueado'; b.style.background='#718096'; b.style.cursor='not-allowed'; b.onclick=null;
+  b.textContent='Reporte Bloqueado';
+  b.style.background='#718096';
+  b.style.cursor='not-allowed';
+  b.disabled=true;
   document.getElementById('bnw').style.display='block';
-  const av=document.getElementById('avbl'); av.style.display='flex';
+  const av=document.getElementById('avbl');
+  av.style.display='flex';
   document.getElementById('caviso').textContent=codR;
 }
 
@@ -565,7 +573,10 @@ function limpiar(){
   document.getElementById('avbl').style.display='none';
   document.getElementById('bnw').style.display='none';
   const b=document.getElementById('bdl');
-  b.textContent='Descargar Reporte'; b.style.background=''; b.style.cursor=''; b.onclick=descargar;
+  b.textContent='Descargar Reporte';
+  b.style.background='';
+  b.style.cursor='';
+  b.disabled=false;
   document.querySelectorAll('.container input,.container select,.container textarea').forEach(el=>{el.disabled=false;el.style.opacity='';el.style.cursor='';});
   document.querySelectorAll('.badd,.bdel,.bda,.fz,.ck,.smf .sb').forEach(el=>{el.style.pointerEvents='';el.style.opacity='';});
   tst('Formulario listo para nuevo reporte');
@@ -613,7 +624,7 @@ document.getElementById('bap').addEventListener('click',addP);
 document.getElementById('baa').addEventListener('click',addA);
 document.getElementById('bam').addEventListener('click',addM);
 document.getElementById('bapl').addEventListener('click',addPl);
-document.getElementById('bdl').addEventListener('click',descargar);
+document.getElementById('bdl').addEventListener('click', function(){ if(!bloq) descargar(); });
 document.getElementById('bnw').addEventListener('click',limpiar);
 
 // INICIO
